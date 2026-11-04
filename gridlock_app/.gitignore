@@ -1,0 +1,38 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*
+!.env.example
+*.env
+**/.env
+**/.env.local
+**/.env.*
+!**/.env.example
+**/*.env
+.neon
+**/.neon
+
+# Python
+.venv
+.venv/
+**/.venv
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Node / Frontend
+node_modules
+node_modules/
+**/node_modules
+**/node_modules/
+dist
+dist/
+**/dist
+**/dist/
+.DS_Store
+**/.DS_Store

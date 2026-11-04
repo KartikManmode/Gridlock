@@ -1,0 +1,51 @@
+"""Custom Ratio Blend (v12).
+
+Ratios: 40% v5 (High-Res) and 60% v6 (Anomaly-Aware).
+"""
+
+import pandas as pd
+import numpy as np
+from pathlib import Path
+
+def main():
+    print("Initializing Custom 40/60 Blend...")
+    
+    # Define paths
+    v5_path = Path("gemini_codes/pure_neural_boost_v5/gemini_v5_pure_neural_boost.csv")
+    v6_path = Path("gemini_codes/anomaly_aware_v6/gemini_v6_anomaly_aware.csv")
+    
+    # Load Submissions
+    print(f"Loading v5 from {v5_path}")
+    v5 = pd.read_csv(v5_path).set_index("Index").rename(columns={"demand": "v5"})
+    
+    print(f"Loading v6 from {v6_path}")
+    v6 = pd.read_csv(v6_path).set_index("Index").rename(columns={"demand": "v6"})
+    
+    # Align
+    blend_df = v5.join(v6, how="inner")
+    
+    # Define Weights
+    w5, w6 = 0.40, 0.60
+    
+    print(f"Applying custom ratios: v5={w5}, v6={w6}")
+    
+    blend_df["demand"] = (
+        blend_df["v5"] * w5 +
+        blend_df["v6"] * w6
+    )
+    
+    # Final clipping
+    blend_df["demand"] = blend_df["demand"].clip(0.0, 1.0)
+    
+    # Save
+    output_path = Path("gemini_codes/submissions/gemini_v12_40_60_blend.csv")
+    blend_df[["demand"]].reset_index().to_csv(output_path, index=False)
+    
+    print(f"\nCustom Blend saved to: {output_path}")
+    
+    # Quick Stats
+    print("\nBlend Statistics:")
+    print(blend_df["demand"].describe())
+
+if __name__ == "__main__":
+    main()
