@@ -77,7 +77,7 @@ and the Database Schema:
 
 | Directory / Location | Purpose | Relevant DFD / ERD Store |
 | :--- | :--- | :--- |
-| **`backend/`** | Production backend platform with FastAPI REST APIs. | All 5 Processes (P1-P5) |
+| **`backend/`** | Production backend platform with Node.js / Express REST APIs. | All 5 Processes (P1-P5) |
 | ├── `backend/p1_auth_rbac/` | Authentication, password hashing, JWT tokens, RBAC roles. | P1: Process 1.0 / `D1: users` |
 | ├── `backend/p2_zone_sensors/` | Zone management, geohash spatial resolution, sensor stream ingestion. | P2: Process 2.0 / `D2: zones, sensor_records` |
 | ├── `backend/p3_forecasting/` | Lag feature extraction, forecast request handling, forecast logging. | P3: Process 3.0 / `D3: prediction_logs` |
@@ -86,7 +86,7 @@ and the Database Schema:
 | ├── `backend/p5_analytics_dashboard/`| Summary KPIs, dynamic geospatial heatmaps, hotspot aggregation. | P5: Process 5.0 |
 | ├── `backend/database/` | SQLite (`gridlock.db`) & PostgreSQL DDL schemas, connection pool, seed scripts. | D1, D2, D3, D4 |
 | ├── `backend/api/` | REST route controllers for all 5 processes. | API layer |
-| ├── `backend/main.py` | Unified FastAPI application entrypoint. | API Server |
+| ├── `backend/src/server.js` | Unified Node.js / Express application entrypoint. | API Server |
 | └── `backend/test_backend.py` | Automated end-to-end verification test suite. | Testing |
 | **`database/`** | Database architecture specifications. | ERD specification |
 | ├── `Traffic Congestion Monitoring Architecture-2026-11-03-212351.mmd` | Mermaid Entity-Relationship Diagram. | ERD |
