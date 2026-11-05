@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Clock, FastForward } from 'lucide-react';
 
-interface TimeSliderProps {
-  slotIndex: number;
-  onSlotChange: (slot: number) => void;
-}
-
-export const TimeSlider: React.FC<TimeSliderProps> = ({ slotIndex, onSlotChange }) => {
+export const TimeSlider = ({ slotIndex, onSlotChange }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState<number>(1); // 1x, 2x, 4x
+  const [speed, setSpeed] = useState(1); // 1x, 2x, 4x
 
   // Compute time string from slotIndex (0 = 00:00, 95 = 23:45)
   const totalMinutes = slotIndex * 15;
@@ -42,7 +37,7 @@ export const TimeSlider: React.FC<TimeSliderProps> = ({ slotIndex, onSlotChange 
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [isPlaying, slotIndex, speed]);
+  }, [isPlaying, slotIndex, speed, onSlotChange]);
 
   return (
     <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 w-[92%] max-w-3xl px-5 py-3.5 rounded-2xl bg-slate-900/95 border border-slate-700/80 shadow-2xl backdrop-blur-md">

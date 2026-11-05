@@ -1,21 +1,12 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import maplibregl from 'maplibre-gl';
-import { Zone, Incident, CongestionLevel } from '../types';
 import { geohashToPolygonCoordinates, getCongestionColor } from '../utils/geohash';
 import { checkWebGLSupport } from '../utils/webgl';
 import { Tactical2DMap } from './Tactical2DMap';
 import { Maximize2, Layers, MapPin } from 'lucide-react';
 
-interface MapLibreHeatmapProps {
-  zones: Zone[];
-  incidents: Incident[];
-  selectedZone: Zone | null;
-  onSelectZone: (zone: Zone) => void;
-  slotIndex: number; // 0 to 95 (15 min intervals)
-}
-
 // Resilient inline style using CARTO Dark Matter raster tiles (zero external json/font fetch dependency)
-const INLINE_MAP_STYLE: maplibregl.StyleSpecification = {
+const INLINE_MAP_STYLE = {
   version: 8,
   sources: {
     'carto-dark': {
@@ -48,7 +39,7 @@ const INLINE_MAP_STYLE: maplibregl.StyleSpecification = {
   ],
 };
 
-export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
+export const MapLibreHeatmap = ({
   zones,
   incidents,
   selectedZone,
@@ -56,24 +47,24 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
   slotIndex,
 }) => {
   // Check WebGL availability safely
-  const [webglStatus] = useState<{ supported: boolean; reason?: string }>(() => checkWebGLSupport());
-  const [webglFailed, setWebglFailed] = useState<boolean>(!webglStatus.supported);
+  const [webglStatus] = useState(() => checkWebGLSupport());
+  const [webglFailed, setWebglFailed] = useState(!webglStatus.supported);
 
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const markersRef = useRef<maplibregl.Marker[]>([]);
-  const [hoveredZone, setHoveredZone] = useState<Zone | null>(null);
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const [hoveredZone, setHoveredZone] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Keep live references for map event listeners without stale closures
-  const zonesRef = useRef<Zone[]>(zones);
+  const zonesRef = useRef(zones);
   zonesRef.current = zones;
-  const slotIndexRef = useRef<number>(slotIndex);
+  const slotIndexRef = useRef(slotIndex);
   slotIndexRef.current = slotIndex;
 
   // Calculate diurnal multiplier based on 15-minute slotIndex (0 = 00:00, 36 = 09:00, 72 = 18:00)
-  const getSlotCongestion = (baseLevel: CongestionLevel, zoneId: number, slot: number): { level: CongestionLevel; volume: number } => {
+  const getSlotCongestion = (baseLevel, zoneId, slot) => {
     const hour = (slot * 15) / 60;
     const mPeak = Math.exp(-Math.pow(hour - 9.0, 2) / (2 * 1.8 * 1.8));
     const ePeak = Math.exp(-Math.pow(hour - 18.5, 2) / (2 * 2.2 * 2.2));
@@ -83,7 +74,7 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
     const zoneSeed = ((zoneId * 17) % 10) / 50;
     const finalVolume = Math.min(1.0, Math.max(0.08, timeFactor + zoneSeed + baseBias));
 
-    let level: CongestionLevel = 'LOW';
+    let level = 'LOW';
     if (finalVolume >= 0.75) level = 'SEVERE';
     else if (finalVolume >= 0.55) level = 'HIGH';
     else if (finalVolume >= 0.35) level = 'MEDIUM';
@@ -137,7 +128,7 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
     return [
       [minLon - 0.015, minLat - 0.015],
       [maxLon + 0.015, maxLat + 0.015],
-    ] as [[number, number], [number, number]];
+    ];
   }, [zones]);
 
   // Fit bounds helper
@@ -157,7 +148,7 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
     if (!mapContainerRef.current || mapRef.current) return;
 
     // Center around the dataset's geohash coordinates by default
-    const initialCenter: [number, number] = [90.7745, -5.4547];
+    const initialCenter = [90.7745, -5.4547];
 
     try {
       const map = new maplibregl.Map({
@@ -174,7 +165,7 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
       mapRef.current = map;
 
       map.on('error', (e) => {
-        if (e?.error?.message?.includes('WebGL') || (e as any)?.statusMessage?.includes('WebGL')) {
+        if (e?.error?.message?.includes('WebGL') || e?.statusMessage?.includes('WebGL')) {
           console.warn('MapLibre WebGL runtime error caught, falling back to Tactical 2D Canvas:', e);
           setWebglFailed(true);
         }
@@ -186,7 +177,7 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
         // Add Zones Polygon Source
         map.addSource('zones-source', {
           type: 'geojson',
-          data: buildZonesGeoJSON() as any,
+          data: buildZonesGeoJSON(),
         });
 
         // Layer 1: Polygon Fill with dynamic opacity
@@ -300,9 +291,9 @@ export const MapLibreHeatmap: React.FC<MapLibreHeatmapProps> = ({
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
 
-    const source = map.getSource('zones-source') as maplibregl.GeoJSONSource;
+    const source = map.getSource('zones-source');
     if (source) {
-      source.setData(buildZonesGeoJSON() as any);
+      source.setData(buildZonesGeoJSON());
     }
   }, [slotIndex, zones]);
 

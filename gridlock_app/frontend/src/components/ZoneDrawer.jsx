@@ -1,19 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, TrendingUp, ShieldCheck, CloudRain, AlertCircle, ArrowUpRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Zone, ForecastResponse } from '../types';
 import { fetchForecast } from '../services/api';
 import { getCongestionColor } from '../utils/geohash';
 
-interface ZoneDrawerProps {
-  zone: Zone | null;
-  onClose: () => void;
-  onReportIncidentForZone: (zone: Zone) => void;
-}
-
-export const ZoneDrawer: React.FC<ZoneDrawerProps> = ({ zone, onClose, onReportIncidentForZone }) => {
-  const [forecast, setForecast] = useState<ForecastResponse | null>(null);
-  const [chartData, setChartData] = useState<any[]>([]);
+export const ZoneDrawer = ({ zone, onClose, onReportIncidentForZone }) => {
+  const [forecast, setForecast] = useState(null);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     if (!zone) return;
@@ -126,7 +119,7 @@ export const ZoneDrawer: React.FC<ZoneDrawerProps> = ({ zone, onClose, onReportI
               <YAxis stroke="#64748b" fontSize={10} tickLine={false} domain={[0, 100]} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '11px' }}
-                formatter={(val: any) => [`${val}%`, '']}
+                formatter={(val) => [`${val}%`, '']}
               />
               <Area type="monotone" dataKey="Predicted" stroke="#38bdf8" strokeWidth={2} fillOpacity={1} fill="url(#predGrad)" />
               <Area type="monotone" dataKey="Observed" stroke="#22c55e" strokeWidth={1.5} strokeDasharray="3 3" fillOpacity={1} fill="url(#obsGrad)" />

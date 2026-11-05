@@ -1,18 +1,11 @@
-import { CongestionLevel } from '../types';
-
 const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
-
-export interface BoundingBox {
-  minLat: number;
-  maxLat: number;
-  minLon: number;
-  maxLon: number;
-}
 
 /**
  * Decodes geohash string into latitude and longitude intervals.
+ * @param {string} geohash
+ * @returns {{ minLat: number, maxLat: number, minLon: number, maxLon: number }}
  */
-export function decodeGeohashBBox(geohash: string): BoundingBox {
+export function decodeGeohashBBox(geohash) {
   let isEven = true;
   let latInterval = [-90.0, 90.0];
   let lonInterval = [-180.0, 180.0];
@@ -52,8 +45,10 @@ export function decodeGeohashBBox(geohash: string): BoundingBox {
 
 /**
  * Decodes geohash to center { lat, lon }.
+ * @param {string} geohash
+ * @returns {{ lat: number, lon: number }}
  */
-export function decodeGeohash(geohash: string): { lat: number; lon: number } {
+export function decodeGeohash(geohash) {
   const bbox = decodeGeohashBBox(geohash);
   return {
     lat: (bbox.minLat + bbox.maxLat) / 2,
@@ -63,8 +58,10 @@ export function decodeGeohash(geohash: string): { lat: number; lon: number } {
 
 /**
  * Returns GeoJSON polygon coordinates for a geohash bounding box.
+ * @param {string} geohash
+ * @returns {number[][][]}
  */
-export function geohashToPolygonCoordinates(geohash: string): number[][][] {
+export function geohashToPolygonCoordinates(geohash) {
   const bbox = decodeGeohashBBox(geohash);
   return [
     [
@@ -79,12 +76,10 @@ export function geohashToPolygonCoordinates(geohash: string): number[][][] {
 
 /**
  * Maps congestion level to Tailwind & HEX colors.
+ * @param {'LOW' | 'MEDIUM' | 'HIGH' | 'SEVERE'} level
+ * @returns {{ hex: string, fillHex: string, badgeClass: string }}
  */
-export function getCongestionColor(level: CongestionLevel): {
-  hex: string;
-  fillHex: string;
-  badgeClass: string;
-} {
+export function getCongestionColor(level) {
   switch (level) {
     case 'SEVERE':
       return {

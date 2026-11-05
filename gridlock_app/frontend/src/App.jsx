@@ -5,7 +5,6 @@ import { TimeSlider } from './components/TimeSlider';
 import { ZoneDrawer } from './components/ZoneDrawer';
 import { IncidentModal } from './components/IncidentModal';
 import { OperatorTriagePanel } from './components/OperatorTriagePanel';
-import { Zone, Incident, CityKPIs, UserRole, ViolationType, SeverityLevel } from './types';
 import {
   fetchDashboardData,
   fetchZones,
@@ -18,15 +17,15 @@ import {
 } from './services/api';
 
 export function App() {
-  const [currentRole, setCurrentRole] = useState<UserRole>('operator');
-  const [slotIndex, setSlotIndex] = useState<number>(36); // Default 09:00 AM Morning Rush
-  const [zones, setZones] = useState<Zone[]>(FALLBACK_ZONES);
-  const [incidents, setIncidents] = useState<Incident[]>(FALLBACK_INCIDENTS);
-  const [kpis, setKpis] = useState<CityKPIs>(FALLBACK_KPIS);
-  const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
-  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
-  const [preselectedZoneForReport, setPreselectedZoneForReport] = useState<Zone | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentRole, setCurrentRole] = useState('operator');
+  const [slotIndex, setSlotIndex] = useState(36); // Default 09:00 AM Morning Rush
+  const [zones, setZones] = useState(FALLBACK_ZONES);
+  const [incidents, setIncidents] = useState(FALLBACK_INCIDENTS);
+  const [kpis, setKpis] = useState(FALLBACK_KPIS);
+  const [selectedZone, setSelectedZone] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [preselectedZoneForReport, setPreselectedZoneForReport] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load initial data from backend (with graceful fallback)
   const loadData = async () => {
@@ -53,12 +52,7 @@ export function App() {
   }, []);
 
   // Handle reporting violation
-  const handleReportIncident = async (payload: {
-    zone_id: number;
-    violation_type: ViolationType;
-    severity: SeverityLevel;
-    description: string;
-  }) => {
+  const handleReportIncident = async (payload) => {
     const newInc = await reportIncident(payload);
     setIncidents(prev => [newInc, ...prev]);
     setKpis(prev => ({
@@ -68,7 +62,7 @@ export function App() {
   };
 
   // Handle officer dispatch
-  const handleDispatchOfficer = async (incidentId: number, badgeNumber: string) => {
+  const handleDispatchOfficer = async (incidentId, badgeNumber) => {
     await dispatchOfficer(incidentId, badgeNumber);
     setIncidents(prev =>
       prev.map(inc =>

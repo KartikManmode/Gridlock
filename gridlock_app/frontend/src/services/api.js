@@ -1,11 +1,9 @@
-import { Zone, HeatmapPoint, CityKPIs, Incident, ForecastResponse } from '../types';
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL 
   ? `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/api` 
   : '/api';
 
 // Realistic fallback zones matching dataset geohash coordinates
-export const FALLBACK_ZONES: Zone[] = [
+export const FALLBACK_ZONES = [
   { id: 1, geohash: 'qp02zt', junction_name: 'Silk Board Chokepoint', latitude: -5.46295, longitude: 90.68665, capacity: 3500, current_congestion_level: 'SEVERE', zone_tier: 'Core City' },
   { id: 2, geohash: 'qp02z1', junction_name: 'MG Road Junction', latitude: -5.48492, longitude: 90.66467, capacity: 2200, current_congestion_level: 'HIGH', zone_tier: 'Core City' },
   { id: 3, geohash: 'qp08bj', junction_name: 'Indiranagar 100ft Rd', latitude: -5.46295, longitude: 90.70862, capacity: 1800, current_congestion_level: 'MEDIUM', zone_tier: 'Mid-Ring' },
@@ -18,7 +16,7 @@ export const FALLBACK_ZONES: Zone[] = [
   { id: 10, geohash: 'qp08gh', junction_name: 'Yeshwantpur Circle', latitude: -5.46844, longitude: 90.84045, capacity: 2400, current_congestion_level: 'MEDIUM', zone_tier: 'Mid-Ring' },
 ];
 
-export const FALLBACK_KPIS: CityKPIs = {
+export const FALLBACK_KPIS = {
   total_active_zones: 50,
   average_city_speed_kmh: 21.4,
   city_wide_congestion_index: 68.2,
@@ -28,14 +26,14 @@ export const FALLBACK_KPIS: CityKPIs = {
   highest_congestion_zone: 'Silk Board Chokepoint',
 };
 
-export const FALLBACK_INCIDENTS: Incident[] = [
+export const FALLBACK_INCIDENTS = [
   { id: 101, zone_id: 1, junction_name: 'Silk Board Chokepoint', geohash: 'qp02zt', violation_type: 'PARKING', severity: 'HIGH', status: 'DISPATCHED', occurred_at: '10 mins ago', officer_badge_number: 'KA-TP-1042', description: 'Double parking blocking outer bus lane' },
   { id: 102, zone_id: 8, junction_name: 'Marathahalli Bridge', geohash: 'qp08by', violation_type: 'SIGNAL', severity: 'HIGH', status: 'REPORTED', occurred_at: '15 mins ago', description: 'Traffic signal jump causing cross-intersection gridlock' },
   { id: 103, zone_id: 2, junction_name: 'MG Road Junction', geohash: 'qp02z1', violation_type: 'PARKING', severity: 'MEDIUM', status: 'DISPATCHED', occurred_at: '25 mins ago', officer_badge_number: 'KA-TP-2089', description: 'Commercial loading truck parked on footpath' },
   { id: 104, zone_id: 4, junction_name: 'Hebbal Flyover', geohash: 'qp08gt', violation_type: 'SPEEDING', severity: 'LOW', status: 'REPORTED', occurred_at: '40 mins ago', description: 'Vehicle breakdown on ramp' },
 ];
 
-export async function fetchDashboardData(): Promise<{ kpis: CityKPIs; heatmap: HeatmapPoint[]; active_hotspots: any[] }> {
+export async function fetchDashboardData() {
   try {
     const res = await fetch(`${API_BASE}/analytics/dashboard`, { signal: AbortSignal.timeout(3000) });
     if (res.ok) {
@@ -46,7 +44,7 @@ export async function fetchDashboardData(): Promise<{ kpis: CityKPIs; heatmap: H
   }
 
   // Generate fallback heatmap points
-  const heatmap: HeatmapPoint[] = FALLBACK_ZONES.map(z => ({
+  const heatmap = FALLBACK_ZONES.map(z => ({
     zone_id: z.id,
     junction_name: z.junction_name,
     geohash: z.geohash,
@@ -68,7 +66,7 @@ export async function fetchDashboardData(): Promise<{ kpis: CityKPIs; heatmap: H
   };
 }
 
-export async function fetchZones(): Promise<Zone[]> {
+export async function fetchZones() {
   try {
     const res = await fetch(`${API_BASE}/zones`, { signal: AbortSignal.timeout(3000) });
     if (res.ok) {
@@ -80,7 +78,7 @@ export async function fetchZones(): Promise<Zone[]> {
   return FALLBACK_ZONES;
 }
 
-export async function fetchIncidents(): Promise<Incident[]> {
+export async function fetchIncidents() {
   try {
     const res = await fetch(`${API_BASE}/incidents`, { signal: AbortSignal.timeout(3000) });
     if (res.ok) {
@@ -93,7 +91,7 @@ export async function fetchIncidents(): Promise<Incident[]> {
   return FALLBACK_INCIDENTS;
 }
 
-export async function reportIncident(payload: { zone_id: number; violation_type: string; severity: string; description: string }): Promise<Incident> {
+export async function reportIncident(payload) {
   try {
     const res = await fetch(`${API_BASE}/incidents`, {
       method: 'POST',
@@ -112,15 +110,15 @@ export async function reportIncident(payload: { zone_id: number; violation_type:
     id: Math.floor(Math.random() * 9000) + 1000,
     zone_id: payload.zone_id,
     junction_name: FALLBACK_ZONES.find(z => z.id === payload.zone_id)?.junction_name || 'Urban Zone',
-    violation_type: payload.violation_type as any,
-    severity: payload.severity as any,
+    violation_type: payload.violation_type,
+    severity: payload.severity,
     status: 'REPORTED',
     occurred_at: 'Just now',
     description: payload.description,
   };
 }
 
-export async function dispatchOfficer(incidentId: number, badgeNumber: string): Promise<boolean> {
+export async function dispatchOfficer(incidentId, badgeNumber) {
   try {
     const res = await fetch(`${API_BASE}/dispatch`, {
       method: 'POST',
@@ -133,7 +131,7 @@ export async function dispatchOfficer(incidentId: number, badgeNumber: string): 
   }
 }
 
-export async function fetchForecast(zoneId: number, minutesAhead: number = 15): Promise<ForecastResponse> {
+export async function fetchForecast(zoneId, minutesAhead = 15) {
   try {
     const res = await fetch(`${API_BASE}/forecast`, {
       method: 'POST',

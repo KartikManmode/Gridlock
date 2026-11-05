@@ -1,31 +1,22 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, AlertTriangle, Send } from 'lucide-react';
-import { Zone, ViolationType, SeverityLevel } from '../types';
 
-interface IncidentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  zones: Zone[];
-  preselectedZone: Zone | null;
-  onSubmit: (data: { zone_id: number; violation_type: ViolationType; severity: SeverityLevel; description: string }) => Promise<void>;
-}
-
-export const IncidentModal: React.FC<IncidentModalProps> = ({
+export const IncidentModal = ({
   isOpen,
   onClose,
   zones,
   preselectedZone,
   onSubmit,
 }) => {
-  const [selectedZoneId, setSelectedZoneId] = useState<number>(preselectedZone?.id || zones[0]?.id || 1);
-  const [violationType, setViolationType] = useState<ViolationType>('PARKING');
-  const [severity, setSeverity] = useState<SeverityLevel>('HIGH');
+  const [selectedZoneId, setSelectedZoneId] = useState(preselectedZone?.id || zones[0]?.id || 1);
+  const [violationType, setViolationType] = useState('PARKING');
+  const [severity, setSeverity] = useState('HIGH');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
@@ -92,7 +83,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
                 <button
                   type="button"
                   key={type}
-                  onClick={() => setViolationType(type as ViolationType)}
+                  onClick={() => setViolationType(type)}
                   className={`py-2 px-2.5 rounded-xl text-center border font-medium transition-all ${
                     violationType === type
                       ? 'bg-rose-500/20 border-rose-500 text-rose-300 shadow-sm'
@@ -109,7 +100,7 @@ export const IncidentModal: React.FC<IncidentModalProps> = ({
           <div>
             <label className="block font-semibold text-slate-300 mb-1.5">Severity Level</label>
             <div className="grid grid-cols-3 gap-2">
-              {(['LOW', 'MEDIUM', 'HIGH'] as SeverityLevel[]).map((lvl) => (
+              {['LOW', 'MEDIUM', 'HIGH'].map((lvl) => (
                 <button
                   type="button"
                   key={lvl}

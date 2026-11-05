@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShieldAlert, Radio, CheckCircle, ChevronLeft, ChevronRight, UserCheck } from 'lucide-react';
-import { Incident } from '../types';
 
-interface OperatorTriagePanelProps {
-  incidents: Incident[];
-  onDispatchOfficer: (incidentId: number, badgeNumber: string) => Promise<void>;
-  onSelectIncidentZone: (zoneId: number) => void;
-}
-
-export const OperatorTriagePanel: React.FC<OperatorTriagePanelProps> = ({
+export const OperatorTriagePanel = ({
   incidents,
   onDispatchOfficer,
   onSelectIncidentZone,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'DISPATCHED'>('ALL');
-  const [activeDispatchId, setActiveDispatchId] = useState<number | null>(null);
+  const [filter, setFilter] = useState('ALL');
+  const [activeDispatchId, setActiveDispatchId] = useState(null);
   const [badgeInput, setBadgeInput] = useState('KA-TP-1042');
 
   const filteredIncidents = incidents.filter((inc) => {
@@ -24,7 +17,7 @@ export const OperatorTriagePanel: React.FC<OperatorTriagePanelProps> = ({
     return true;
   });
 
-  const handleDispatch = async (incidentId: number) => {
+  const handleDispatch = async (incidentId) => {
     if (!badgeInput.trim()) return;
     await onDispatchOfficer(incidentId, badgeInput.trim());
     setActiveDispatchId(null);
@@ -52,7 +45,7 @@ export const OperatorTriagePanel: React.FC<OperatorTriagePanelProps> = ({
 
           {/* Filter Bar */}
           <div className="flex p-1.5 bg-slate-950/60 border-b border-slate-800 text-[10px] font-medium">
-            {(['ALL', 'ACTIVE', 'DISPATCHED'] as const).map((tab) => (
+            {['ALL', 'ACTIVE', 'DISPATCHED'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}

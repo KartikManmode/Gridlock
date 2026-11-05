@@ -1,6 +1,6 @@
 # Gridlock Heatmap: Frontend Application
 
-A production React 18 + Vite + TypeScript web application built according to the **Gridlock Heatmap** product blueprint.
+A production React 18 + Vite web application built with pure JavaScript (JSX), HTML, and CSS according to the **Gridlock Heatmap** product blueprint.
 
 ---
 

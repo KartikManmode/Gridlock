@@ -1,17 +1,7 @@
 import React from 'react';
 import { Radio, Activity, AlertTriangle, Users, PlusCircle, RefreshCw } from 'lucide-react';
-import { UserRole, CityKPIs } from '../types';
 
-interface HeaderProps {
-  currentRole: UserRole;
-  onRoleChange: (role: UserRole) => void;
-  kpis: CityKPIs;
-  onOpenReportModal: () => void;
-  onRefresh: () => void;
-  isLoading: boolean;
-}
-
-export const Header: React.FC<HeaderProps> = ({
+export const Header = ({
   currentRole,
   onRoleChange,
   kpis,
@@ -67,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Role Toggle */}
         <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
           <Users className="w-3.5 h-3.5 text-slate-400 ml-2 mr-1.5" />
-          {(['citizen', 'operator', 'admin'] as UserRole[]).map(role => (
+          {['citizen', 'operator', 'admin'].map(role => (
             <button
               key={role}
               onClick={() => onRoleChange(role)}

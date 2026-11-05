@@ -1,18 +1,8 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Zone, Incident, CongestionLevel } from '../types';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { geohashToPolygonCoordinates, getCongestionColor } from '../utils/geohash';
 import { ZoomIn, ZoomOut, Maximize2, Layers } from 'lucide-react';
 
-interface Tactical2DMapProps {
-  zones: Zone[];
-  incidents: Incident[];
-  selectedZone: Zone | null;
-  onSelectZone: (zone: Zone) => void;
-  slotIndex: number; // 0 to 95
-  webglDisabledReason?: string;
-}
-
-export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
+export const Tactical2DMap = ({
   zones,
   incidents,
   selectedZone,
@@ -20,14 +10,14 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
   slotIndex,
   webglDisabledReason: _webglDisabledReason,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 700 });
-  const [zoom, setZoom] = useState<number>(1);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [hoveredZone, setHoveredZone] = useState<Zone | null>(null);
-  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [hoveredZone, setHoveredZone] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState(null);
   const [showWebglNotice, setShowWebglNotice] = useState(true);
 
   // Resize listener to adapt SVG viewport
@@ -69,7 +59,7 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
   }, [zones]);
 
   // Project longitude & latitude into SVG pixel coordinates
-  const project = (lon: number, lat: number) => {
+  const project = (lon, lat) => {
     const pad = 60;
     const availW = dimensions.width - 2 * pad;
     const availH = dimensions.height - 2 * pad;
@@ -85,7 +75,7 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
   };
 
   // Diurnal multiplier based on 15-minute slotIndex
-  const getSlotCongestion = (baseLevel: CongestionLevel, zoneId: number): { level: CongestionLevel; volume: number } => {
+  const getSlotCongestion = (baseLevel, zoneId) => {
     const hour = (slotIndex * 15) / 60;
     const mPeak = Math.exp(-Math.pow(hour - 9.0, 2) / (2 * 1.8 * 1.8));
     const ePeak = Math.exp(-Math.pow(hour - 18.5, 2) / (2 * 2.2 * 2.2));
@@ -95,7 +85,7 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
     const zoneSeed = ((zoneId * 17) % 10) / 50;
     const finalVolume = Math.min(1.0, Math.max(0.08, timeFactor + zoneSeed + baseBias));
 
-    let level: CongestionLevel = 'LOW';
+    let level = 'LOW';
     if (finalVolume >= 0.75) level = 'SEVERE';
     else if (finalVolume >= 0.55) level = 'HIGH';
     else if (finalVolume >= 0.35) level = 'MEDIUM';
@@ -104,13 +94,13 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
   };
 
   // Pan and drag handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = (e) => {
     if (e.button !== 0) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e) => {
     if (isDragging) {
       setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
     }
@@ -120,7 +110,7 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
     setIsDragging(false);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleWheel = (e) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.15 : 0.88;
     setZoom((prev) => Math.max(0.6, Math.min(4.5, prev * factor)));
@@ -133,7 +123,7 @@ export const Tactical2DMap: React.FC<Tactical2DMapProps> = ({
 
   // Zone incident count map
   const zoneIncidentsMap = useMemo(() => {
-    const map = new Map<number, Incident[]>();
+    const map = new Map();
     incidents.forEach((inc) => {
       const existing = map.get(inc.zone_id) || [];
       existing.push(inc);

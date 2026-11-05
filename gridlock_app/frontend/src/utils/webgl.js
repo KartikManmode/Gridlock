@@ -1,7 +1,8 @@
 /**
  * Utility to safely detect WebGL support in the user's browser.
+ * @returns {{ supported: boolean, reason?: string }}
  */
-export function checkWebGLSupport(): { supported: boolean; reason?: string } {
+export function checkWebGLSupport() {
   if (typeof window === 'undefined') {
     return { supported: false, reason: 'SSR / Window undefined' };
   }
@@ -13,7 +14,7 @@ export function checkWebGLSupport(): { supported: boolean; reason?: string } {
       return { supported: false, reason: 'WebGL context creation failed (hardware acceleration disabled)' };
     }
     return { supported: true };
-  } catch (err: any) {
+  } catch (err) {
     return { supported: false, reason: err?.message || 'WebGL check exception' };
   }
 }
